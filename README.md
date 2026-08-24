@@ -1,7 +1,7 @@
 # Sistema de Gestão de Peças — Automação Digital
 
 Protótipo em Python desenvolvido para o desafio **"Gestão de Peças, Qualidade e Armazenamento"**,
-da disciplina de Lógica de Programação.
+da disciplina de Algoritmos e Lógica de Programação.
 
 O sistema simula, em uma linha de montagem industrial, a inspeção automática de peças,
 substituindo a conferência manual por regras lógicas de aprovação/reprovação, o

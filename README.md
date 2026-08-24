@@ -1,77 +1,65 @@
-# Sistema de Gestão de Peças — Automação Digital
+# Sistema de Gestão de Peças
 
-Protótipo em Python desenvolvido para o desafio **"Gestão de Peças, Qualidade e Armazenamento"**,
-da disciplina de Algoritmos e Lógica de Programação.
+Trabalho da disciplina de Algoritmos e Lógica de Programação — desafio "Gestão de
+Peças, Qualidade e Armazenamento". A ideia é simular a inspeção automática de peças
+numa linha de montagem: em vez de alguém conferir cada peça no olho, o programa
+aplica as regras de qualidade, guarda o que foi aprovado em caixas e no final mostra
+um resumo de tudo.
 
-O sistema simula, em uma linha de montagem industrial, a inspeção automática de peças,
-substituindo a conferência manual por regras lógicas de aprovação/reprovação, o
-armazenamento em caixas de capacidade limitada e a geração de relatórios consolidados.
+## O que o programa faz
 
-## Funcionalidades
+Menu no terminal com 5 opções:
 
-O programa é um **menu interativo em terminal** com 5 opções principais:
+1. Cadastrar nova peça (id, peso, cor, comprimento)
+2. Listar peças aprovadas / reprovadas / todas
+3. Remover peça cadastrada
+4. Listar caixas fechadas
+5. Gerar relatório final
 
-| Opção | Função |
-|---|---|
-| 1 | Cadastrar nova peça (id, peso, cor, comprimento) |
-| 2 | Listar peças aprovadas / reprovadas / todas |
-| 3 | Remover peça cadastrada pelo ID |
-| 4 | Listar caixas fechadas |
-| 5 | Gerar relatório final consolidado |
-| 0 | Sair |
+## Critérios de aprovação
 
-### Regras de qualidade aplicadas automaticamente
+Pra ser aprovada, a peça precisa atender aos três ao mesmo tempo:
 
-Uma peça é **aprovada** somente se atender simultaneamente aos três critérios abaixo;
-caso contrário, é **reprovada** e o(s) motivo(s) específico(s) são registrados:
+- Peso entre 95g e 105g
+- Cor azul ou verde
+- Comprimento entre 10cm e 20cm
 
-- Peso entre **95g e 105g**
-- Cor **azul** ou **verde**
-- Comprimento entre **10cm e 20cm**
+Se falhar em mais de um critério, o sistema mostra todos os motivos, não só o
+primeiro.
 
-### Armazenamento em caixas
+## Sobre as caixas
 
-- Cada caixa comporta no máximo **10 peças aprovadas**.
-- Ao atingir a capacidade máxima, a caixa é **fechada automaticamente** e uma nova é aberta.
-- Se uma peça for removida de uma caixa que já estava fechada, a caixa **reabre**
-  (volta a aceitar novas peças até completar 10 novamente), simulando o reaproveitamento
-  de espaço físico.
+Cada caixa aguenta 10 peças aprovadas. Quando enche, fecha sozinha e abre uma nova.
+Se eu remover uma peça de uma caixa que já estava fechada, ela reabre (volta a
+aceitar peças até encher de novo) — não fazia sentido deixar ela marcada como
+fechada com uma vaga sobrando.
 
 ## Estrutura do código
 
-- **`Peca`**: representa cada peça e contém a lógica de avaliação (`avaliar()`).
-- **`Caixa`**: representa uma caixa de armazenamento e controla seu preenchimento.
-- **`SistemaGestao`**: classe central que orquestra cadastro, avaliação, armazenamento,
-  remoção e geração de relatórios.
-- **Funções de menu**: camada de interface (CLI) que interage com o usuário e chama os
-  métodos da classe `SistemaGestao`.
+- `Peca`: guarda os dados da peça e tem o método que avalia se ela passa ou não
+- `Caixa`: controla quantas peças tem e se já está cheia
+- `SistemaGestao`: junta tudo — cadastro, decisão de armazenamento, remoção e relatório
+- as funções `menu_*`: cada uma cuida de uma opção do menu
 
-## Como rodar o programa
+## Como rodar
 
-**Pré-requisito:** Python 3.8 ou superior instalado ([python.org](https://python.org)).
-
-1. Baixe/clone o repositório.
-2. Abra um terminal na pasta do projeto.
-3. Execute:
+Precisa de Python 3.8+ instalado.
 
 ```bash
 python sistema_pecas.py
 ```
 
-(em alguns sistemas o comando é `python3 sistema_pecas.py`)
+(em algumas máquinas o comando é `python3 sistema_pecas.py`)
 
-4. Siga as instruções do menu, digitando o número da opção desejada e pressionando Enter.
+Depois é só seguir o menu digitando o número da opção.
 
-## Exemplo de entrada e saída
+## Exemplo de uso
 
-**Cadastrando uma peça aprovada:**
+Cadastrando uma peça aprovada:
 
 ```
 Escolha uma opção: 1
 
-=======================================================
-                  CADASTRAR NOVA PEÇA
-=======================================================
 ID da peça: A001
 Peso (g): 98.5
 Cor: azul
@@ -80,7 +68,7 @@ Comprimento (cm): 15
   Resultado: ID A001 | Peso: 98.5g | Cor: azul | Comprimento: 15.0cm | Status: Aprovada | Caixa: 1
 ```
 
-**Cadastrando uma peça reprovada (múltiplos motivos):**
+Cadastrando uma peça reprovada por mais de um motivo:
 
 ```
 ID da peça: A002
@@ -94,14 +82,11 @@ Comprimento (cm): 25
   Comprimento fora do padrão (25.0cm; aceito entre 10cm e 20cm)
 ```
 
-**Relatório final:**
+Relatório final:
 
 ```
 Escolha uma opção: 5
 
-=======================================================
-                    RELATÓRIO FINAL
-=======================================================
 Total de peças aprovadas .......... 1
 Total de peças reprovadas .......... 1
 Quantidade de caixas utilizadas .... 1
@@ -112,15 +97,15 @@ Motivos de reprovação:
   - Comprimento fora do padrão: 1 peça(s)
 ```
 
-## Testes realizados
+## Testes que fiz
 
-O sistema foi validado com um cenário de 12 peças aprovadas seguidas (para confirmar o
-fechamento automático da caixa ao atingir 10 unidades e a abertura da caixa seguinte),
-peças reprovadas por peso, cor, comprimento e por múltiplos motivos simultâneos, e a
-remoção de uma peça de uma caixa já fechada (confirmando a reabertura da caixa).
+Rodei um teste com 12 peças aprovadas seguidas pra ver se a caixa fechava certo com
+10 e abria a próxima. Testei peça reprovada por cada critério separado e por vários
+critérios juntos. E testei remover uma peça de uma caixa já fechada, pra confirmar
+que ela reabre.
 
 ## Autor
 
-**Thiago Felipe de Oliveira**
+Thiago Felipe de Oliveira
 RA: 293439
 Curso: Graduação Tecnológica em Inteligência Artificial e Automação Digital

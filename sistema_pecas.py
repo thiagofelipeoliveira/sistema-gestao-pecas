@@ -184,6 +184,36 @@ def ler_texto_nao_vazio(mensagem):
         print("  >> Este campo não pode ficar vazio.")
 
 
+# ---------- dados de exemplo (só pra facilitar de mostrar no vídeo) ----------
+
+def carregar_pecas_exemplo(sistema):
+    """
+    Cadastra algumas peças de exemplo assim que o programa abre, pra já ter
+    dados prontos pra mostrar nas opções de listar/relatório sem precisar
+    digitar tudo na hora da gravação. É só remover a chamada dessa função lá
+    no menu_principal() se não quiser mais esse carregamento automático.
+    """
+    exemplos = [
+        ("P001", 98,  "azul",  15),
+        ("P002", 100, "verde", 12),
+        ("P003", 102, "azul",  18),
+        ("P004", 97,  "verde", 14),
+        ("P005", 99,  "azul",  16),
+        ("P006", 200, "azul",  15),    # reprovada: peso
+        ("P007", 100, "preto", 15),    # reprovada: cor
+        ("P008", 100, "verde", 50),    # reprovada: comprimento
+        ("P009", 150, "amarelo", 30),  # reprovada: vários motivos
+        ("P010", 95,  "azul",  10),
+        ("P011", 105, "verde", 20),
+        ("P012", 96,  "azul",  17),
+        ("P013", 101, "verde", 13),
+        ("P014", 100, "azul",  15),    # essa fecha a caixa 1 (10 aprovadas)
+        ("P015", 98,  "verde", 14),    # essa já entra na caixa 2
+    ]
+    for id_peca, peso, cor, comprimento in exemplos:
+        sistema.cadastrar_peca(id_peca, peso, cor, comprimento)
+
+
 # ---------- menu (interface em terminal) ----------
 
 def exibir_cabecalho(texto):
@@ -264,6 +294,7 @@ def menu_relatorio(sistema):
 
 def menu_principal():
     sistema = SistemaGestao()
+    carregar_pecas_exemplo(sistema)  # remova essa linha se não quiser dados de exemplo
 
     opcoes = {
         "1": ("Cadastrar nova peça", menu_cadastrar),

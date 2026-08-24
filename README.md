@@ -53,6 +53,15 @@ python sistema_pecas.py
 
 Depois é só seguir o menu digitando o número da opção.
 
+## Dados de exemplo
+
+Assim que o programa abre, ele já cadastra automaticamente 15 peças de exemplo
+(algumas aprovadas, algumas reprovadas por motivos diferentes), pra já ter
+dados prontos nas opções de listar, caixas fechadas e relatório sem precisar
+digitar tudo na hora. Isso é feito pela função `carregar_pecas_exemplo()`,
+chamada no início do `menu_principal()`. Se quiser rodar o sistema do zero,
+sem nenhuma peça pré-cadastrada, é só remover ou comentar essa linha.
+
 ## Exemplo de uso
 
 Cadastrando uma peça aprovada:

@@ -1,43 +1,43 @@
 """
 Desafio de Automação Digital: Gestão de Peças, Qualidade e Armazenamento
--------------------------------------------------------------------------
-Sistema em Python para controle de produção e qualidade de peças fabricadas
-em uma linha de montagem industrial.
+Disciplina: Algoritmos e Lógica de Programação
 
 Autor: Thiago Felipe de Oliveira
 RA: 293439
 Curso: Graduação Tecnológica em Inteligência Artificial e Automação Digital
-Disciplina: Algoritmos e Lógica de Programação
+
+Ideia geral: simular a inspeção de peças de uma linha de montagem, que hoje
+é feita na mão. O programa recebe os dados de cada peça, decide se ela passa
+ou não nos critérios de qualidade, guarda as aprovadas em caixas de 10 e no
+final mostra um resumo de tudo.
 """
 
-# ============================================================
-# CONSTANTES - critérios de qualidade e regras de negócio
-# ============================================================
-PESO_MINIMO = 95       # gramas
-PESO_MAXIMO = 105      # gramas
+# critérios de aprovação (dei uma olhada no enunciado e coloquei aqui em cima
+# pra ser fácil de mudar depois, se precisar)
+PESO_MINIMO = 95
+PESO_MAXIMO = 105
 CORES_ACEITAS = ("azul", "verde")
-COMPRIMENTO_MINIMO = 10   # cm
-COMPRIMENTO_MAXIMO = 20   # cm
-CAPACIDADE_CAIXA = 10      # peças por caixa
+COMPRIMENTO_MINIMO = 10
+COMPRIMENTO_MAXIMO = 20
+CAPACIDADE_CAIXA = 10
 
 
-# ============================================================
-# CLASSES DO DOMÍNIO
-# ============================================================
 class Peca:
-    """Representa uma peça produzida na linha de montagem."""
+    """Uma peça que saiu da linha de montagem: id, peso, cor e comprimento."""
 
     def __init__(self, id_peca, peso, cor, comprimento):
         self.id = id_peca
         self.peso = peso
         self.cor = cor.lower().strip()
         self.comprimento = comprimento
-        self.status = None      # "Aprovada" ou "Reprovada"
-        self.motivos = []       # lista de motivos de reprovação (se houver)
-        self.caixa = None       # número da caixa em que foi armazenada
+        self.status = None
+        self.motivos = []  # só é preenchido se a peça for reprovada
+        self.caixa = None
 
     def avaliar(self):
-        """Aplica as regras de qualidade e define status/motivos da peça."""
+        # checo os três critérios separadamente porque uma peça pode falhar
+        # em mais de um ao mesmo tempo, e eu queria mostrar todos os motivos
+        # e não só o primeiro que encontrar
         motivos = []
 
         if not (PESO_MINIMO <= self.peso <= PESO_MAXIMO):
@@ -72,7 +72,7 @@ class Peca:
 
 
 class Caixa:
-    """Representa uma caixa de armazenamento de peças aprovadas."""
+    """Caixa onde as peças aprovadas vão sendo guardadas, até 10 por vez."""
 
     def __init__(self, numero):
         self.numero = numero
@@ -92,14 +92,13 @@ class Caixa:
 
 
 class SistemaGestao:
-    """Sistema central: cadastro, avaliação, armazenamento e relatórios."""
+    """Junta tudo: cadastro de peças, avaliação, caixas e relatório final."""
 
     def __init__(self):
-        self.pecas_cadastradas = {}   # id -> Peca (todas, aprovadas e reprovadas)
-        self.caixas = [Caixa(1)]      # começa com a caixa 1 aberta
+        self.pecas_cadastradas = {}
+        self.caixas = [Caixa(1)]
         self.proximo_numero_caixa = 2
 
-    # -------------------- Cadastro --------------------
     def cadastrar_peca(self, id_peca, peso, cor, comprimento):
         if id_peca in self.pecas_cadastradas:
             raise ValueError(f"Já existe uma peça cadastrada com o ID '{id_peca}'.")
@@ -114,7 +113,7 @@ class SistemaGestao:
         return peca
 
     def _armazenar(self, peca):
-        """Coloca a peça aprovada na caixa atual; abre nova caixa se necessário."""
+        # se a caixa atual já tá cheia, abre uma nova antes de guardar
         caixa_atual = self.caixas[-1]
         if caixa_atual.fechada:
             caixa_atual = Caixa(self.proximo_numero_caixa)
@@ -122,26 +121,24 @@ class SistemaGestao:
             self.caixas.append(caixa_atual)
         caixa_atual.adicionar(peca)
 
-    # -------------------- Consultas --------------------
     def listar_por_status(self, status):
         return [p for p in self.pecas_cadastradas.values() if p.status == status]
 
     def listar_caixas_fechadas(self):
         return [c for c in self.caixas if c.fechada]
 
-    # -------------------- Remoção --------------------
     def remover_peca(self, id_peca):
         peca = self.pecas_cadastradas.get(id_peca)
         if peca is None:
             raise ValueError(f"Nenhuma peça encontrada com o ID '{id_peca}'.")
 
-        # Se a peça está armazenada em uma caixa, remove de lá também.
+        # se a peça já tava numa caixa, tira ela de lá também.
+        # e como a caixa perdeu uma peça, ela deixa de estar "cheia"
+        # e volta a aceitar peças novas
         if peca.caixa is not None:
             for caixa in self.caixas:
                 if caixa.numero == peca.caixa:
                     caixa.pecas = [p for p in caixa.pecas if p.id != id_peca]
-                    # Uma caixa que perde uma peça deixa de estar cheia,
-                    # então ela volta a poder receber novas peças.
                     if len(caixa.pecas) < CAPACIDADE_CAIXA:
                         caixa.fechada = False
                     break
@@ -149,32 +146,28 @@ class SistemaGestao:
         del self.pecas_cadastradas[id_peca]
         return peca
 
-    # -------------------- Relatório --------------------
     def gerar_relatorio(self):
         aprovadas = self.listar_por_status("Aprovada")
         reprovadas = self.listar_por_status("Reprovada")
         caixas_com_pecas = [c for c in self.caixas if c.pecas]
 
-        # Contabiliza motivos de reprovação agrupados
         contagem_motivos = {}
         for peca in reprovadas:
             for motivo in peca.motivos:
-                chave = motivo.split(" (")[0]  # agrupa por tipo de motivo
+                chave = motivo.split(" (")[0]
                 contagem_motivos[chave] = contagem_motivos.get(chave, 0) + 1
 
-        relatorio = {
+        return {
             "total_aprovadas": len(aprovadas),
             "total_reprovadas": len(reprovadas),
             "motivos_reprovacao": contagem_motivos,
             "quantidade_caixas_utilizadas": len(caixas_com_pecas),
             "pecas_reprovadas_detalhe": reprovadas,
         }
-        return relatorio
 
 
-# ============================================================
-# FUNÇÕES AUXILIARES DE ENTRADA (com validação)
-# ============================================================
+# ---------- funções auxiliares de leitura, com uma validação simples ----------
+
 def ler_float(mensagem):
     while True:
         try:
@@ -191,9 +184,8 @@ def ler_texto_nao_vazio(mensagem):
         print("  >> Este campo não pode ficar vazio.")
 
 
-# ============================================================
-# INTERFACE DE MENU (CLI)
-# ============================================================
+# ---------- menu (interface em terminal) ----------
+
 def exibir_cabecalho(texto):
     print("\n" + "=" * 55)
     print(texto.center(55))

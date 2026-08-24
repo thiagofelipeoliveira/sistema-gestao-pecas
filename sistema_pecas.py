@@ -7,7 +7,7 @@ em uma linha de montagem industrial.
 Autor: Thiago Felipe de Oliveira
 RA: 293439
 Curso: Graduação Tecnológica em Inteligência Artificial e Automação Digital
-Disciplina: Lógica de Programação
+Disciplina: Algoritmos e Lógica de Programação
 """
 
 # ============================================================
